@@ -1,4 +1,3 @@
-
 use glam::Vec2;
 use rand::Rng;
 
@@ -48,6 +47,5 @@ impl Particle {
             + c_coeff * rng.random_range(0.0..1.1) * (self.pbest_pos - self.pos)
             + s_coeff * rng.random_range(0.0..1.0) * (gbest - self.pos);
         self.pos += self.vel;
-
     }
 }

@@ -1,4 +1,7 @@
-use std::{f32::consts::{E, PI, TAU}, fmt::{self, Display}};
+use std::{
+    f32::consts::{E, PI, TAU},
+    fmt::{self, Display},
+};
 
 use clap::ValueEnum;
 use glam::Vec2;
@@ -9,7 +12,7 @@ pub enum Function {
     Ackley,
     Booth,
     Easom,
-    Himmelblau
+    Himmelblau,
 }
 
 impl Display for Function {
@@ -35,10 +38,10 @@ impl Function {
             }
             Function::Booth => {
                 (pos.x + 2.0 * pos.y - 7.0).powi(2) + (2.0 * pos.x + pos.y - 5.0).powi(2)
-            },
+            }
             Function::Easom => {
-                -pos.x.cos()*pos.y.cos() * (-((pos.x - PI).powi(2) + (pos.y - PI).powi(2))).exp()
-            },
+                -pos.x.cos() * pos.y.cos() * (-((pos.x - PI).powi(2) + (pos.y - PI).powi(2))).exp()
+            }
             Function::Himmelblau => {
                 (pos.x.powi(2) + pos.y - 11.0).powi(2) + (pos.x + pos.y.powi(2) - 7.0).powi(2)
             }

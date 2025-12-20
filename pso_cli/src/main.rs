@@ -1,8 +1,4 @@
-use std::{
-    fs::File,
-    io::Write,
-    time::Instant,
-};
+use std::{fs::File, io::Write, time::Instant};
 
 use clap::Parser;
 use glam::Vec2;
@@ -57,11 +53,7 @@ fn main() -> std::io::Result<()> {
 }
 
 #[derive(Parser, Serialize, Clone, Copy)]
-#[command(
-    name = "Particle Swarm Optimizer",
-    version,
-    about,    
-)]
+#[command(name = "Particle Swarm Optimizer", version, about)]
 struct Args {
     /// Number of particles in the swarm
     particle_size: usize,

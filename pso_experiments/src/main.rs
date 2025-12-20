@@ -1,4 +1,10 @@
-use std::{fs::File, io::{BufWriter, Write}, path::PathBuf, sync::Mutex, time::Instant};
+use std::{
+    fs::File,
+    io::{BufWriter, Write},
+    path::PathBuf,
+    sync::Mutex,
+    time::Instant,
+};
 
 use clap::Parser;
 use csv::ReaderBuilder;
@@ -16,18 +22,16 @@ fn main() {
 
     let writer = Mutex::new(BufWriter::new(file));
 
-    experiments
-        .par_iter()
-        .for_each(|e| {
-            for _ in 0..args.repeats {
-                let result = run_experiment(e);
-                let json = serde_json::to_string(&result).unwrap();
+    experiments.par_iter().for_each(|e| {
+        for _ in 0..args.repeats {
+            let result = run_experiment(e);
+            let json = serde_json::to_string(&result).unwrap();
 
-                let mut w = writer.lock().unwrap();
-                w.write_all(json.as_bytes()).unwrap();
-                w.write_all(b"\n").unwrap();
-            }
-        });
+            let mut w = writer.lock().unwrap();
+            w.write_all(json.as_bytes()).unwrap();
+            w.write_all(b"\n").unwrap();
+        }
+    });
 }
 
 fn run_experiment(parameters: &Parameters) -> Results {
@@ -36,15 +40,15 @@ fn run_experiment(parameters: &Parameters) -> Results {
         parameters.inertia_weight,
         parameters.c_coeff,
         parameters.s_coeff,
-        parameters.function
+        parameters.function,
     );
 
     let start = Instant::now();
-    
+
     let best = swarm.train(parameters.episodes);
 
     let duration = start.elapsed();
-    
+
     let worst = Swarm::argmax(&swarm.particles);
 
     let mut pvals: Vec<f32> = swarm.particles.iter().map(|p| p.pbest_val).collect();
@@ -59,7 +63,6 @@ fn run_experiment(parameters: &Parameters) -> Results {
         std: math::std_dev(&pvals),
         time: duration.as_micros(),
     }
-
 }
 
 fn load_experiments(path: PathBuf) -> Vec<Parameters> {
@@ -68,7 +71,8 @@ fn load_experiments(path: PathBuf) -> Vec<Parameters> {
         .from_path(path)
         .expect("failed to open CSV");
 
-    reader.deserialize()
+    reader
+        .deserialize()
         .map(|r| r.expect("bad CSV row"))
         .collect()
 }
@@ -92,7 +96,7 @@ struct Results {
     average: f32,
     median: f32,
     std: f32,
-    time: u128
+    time: u128,
 }
 
 #[derive(Parser)]

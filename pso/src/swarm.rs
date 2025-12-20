@@ -18,7 +18,7 @@ impl Swarm {
         inertia_weight: f32,
         c_coeff: f32,
         s_coeff: f32,
-        function: Function
+        function: Function,
     ) -> Self {
         let (x_min, y_min, x_max, y_max) = function.domain();
         let particles: Vec<Particle> = (0..particle_count)
@@ -74,7 +74,7 @@ impl Swarm {
         self.gbest_pos = best.pbest_pos;
         self.gbest_val = best.pbest_val;
     }
-    
+
     pub fn train(&mut self, episodes: usize) -> Particle {
         for _ in 0..episodes {
             self.step();
