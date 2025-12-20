@@ -1,0 +1,10 @@
+[workspace]
+resolver = "3"
+members = ["pso", "pso_cli", "pso_experiments"]
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
