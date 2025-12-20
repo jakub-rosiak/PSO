@@ -57,12 +57,28 @@ fn main() -> std::io::Result<()> {
 }
 
 #[derive(Parser, Serialize, Clone, Copy)]
+#[command(
+    name = "Particle Swarm Optimizer",
+    version,
+    about,    
+)]
 struct Args {
+    /// Number of particles in the swarm
     particle_size: usize,
+
+    /// Number of iterations (episodes) for which the swarm will be trained
     episodes: usize,
+
+    /// Inertia Weight
     inertia_weight: f32,
+
+    /// Cognitive coefficient (c1)
     c_coeff: f32,
+
+    /// Social coefficient (c2)
     s_coeff: f32,
+
+    /// Optimization function to evaluate
     function: Function,
 }
 

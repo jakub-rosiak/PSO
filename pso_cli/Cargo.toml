@@ -1,6 +1,7 @@
 [package]
 name = "pso_cli"
 version = "0.1.0"
+description = "Runs a single particle swarm optimization experiment."
 edition = "2024"
 
 [dependencies]

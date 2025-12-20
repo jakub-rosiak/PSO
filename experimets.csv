@@ -1,0 +1,11 @@
+function,particle_size,episodes,inertia_weight,c_coeff,s_coeff
+Ackley,20,100,0.5,1.5,1.5
+Ackley,20,500,0.7,2.0,2.0
+Ackley,50,500,0.7,2.0,2.0
+Ackley,50,1000,0.9,2.5,2.5
+Ackley,100,500,0.7,2.0,2.0
+Booth,20,100,0.5,1.5,1.5
+Booth,20,500,0.7,2.0,2.0
+Booth,50,500,0.7,2.0,2.0
+Booth,50,1000,0.9,2.5,2.5
+Booth,100,500,0.7,2.0,2.0

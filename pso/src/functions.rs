@@ -2,9 +2,9 @@ use std::{f32::consts::{E, PI, TAU}, fmt::{self, Display}};
 
 use clap::ValueEnum;
 use glam::Vec2;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, ValueEnum, Serialize)]
+#[derive(Debug, Clone, Copy, ValueEnum, Serialize, Deserialize)]
 pub enum Function {
     Ackley,
     Booth,
