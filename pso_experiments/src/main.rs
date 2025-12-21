@@ -13,7 +13,7 @@ use pso::{functions::Function, math, swarm::Swarm};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use serde::{Deserialize, Serialize};
 
-use crate::observer::ExperimentObserver;
+use crate::observer::{BestPoint, ExperimentObserver};
 
 mod observer;
 
@@ -62,7 +62,7 @@ fn run_experiment(parameters: &Parameters) -> Results {
 
     Results {
         params: *parameters,
-        particles: observer,
+        particles: observer.points,
         best: best.pbest_val,
         best_pos: best.pbest_pos,
         worst: worst.pbest_val,
@@ -98,7 +98,7 @@ struct Parameters {
 #[derive(Serialize)]
 struct Results {
     params: Parameters,
-    particles: ExperimentObserver,
+    particles: Vec<BestPoint>,
     best: f32,
     best_pos: Vec2,
     worst: f32,

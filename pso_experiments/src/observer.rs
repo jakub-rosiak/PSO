@@ -2,9 +2,8 @@ use glam::Vec2;
 use pso::swarm::SwarmObserver;
 use serde::Serialize;
 
-#[derive(Serialize)]
 pub struct ExperimentObserver {
-    points: Vec<BestPoint>
+    pub points: Vec<BestPoint>
 }
 
 #[derive(Serialize)]
