@@ -13,6 +13,10 @@ use pso::{functions::Function, math, swarm::Swarm};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use serde::{Deserialize, Serialize};
 
+use crate::observer::ExperimentObserver;
+
+mod observer;
+
 fn main() {
     let args = Args::parse();
 
@@ -43,18 +47,22 @@ fn run_experiment(parameters: &Parameters) -> Results {
         parameters.function,
     );
 
+    let mut observer = ExperimentObserver::new(parameters.episodes);
+
     let start = Instant::now();
 
-    let best = swarm.train(parameters.episodes);
+    swarm.train(parameters.episodes, Some(&mut observer));
 
     let duration = start.elapsed();
 
-    let worst = Swarm::argmax(&swarm.particles);
+    let best = swarm.best();
+    let worst = swarm.worst();
 
     let mut pvals: Vec<f32> = swarm.particles.iter().map(|p| p.pbest_val).collect();
 
     Results {
         params: *parameters,
+        particles: observer,
         best: best.pbest_val,
         best_pos: best.pbest_pos,
         worst: worst.pbest_val,
@@ -90,6 +98,7 @@ struct Parameters {
 #[derive(Serialize)]
 struct Results {
     params: Parameters,
+    particles: ExperimentObserver,
     best: f32,
     best_pos: Vec2,
     worst: f32,

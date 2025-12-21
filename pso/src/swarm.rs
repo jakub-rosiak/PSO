@@ -40,7 +40,7 @@ impl Swarm {
         }
     }
 
-    pub fn argmin(particles: &[Particle]) -> &Particle {
+    fn argmin(particles: &[Particle]) -> &Particle {
         particles
             .iter()
             .enumerate()
@@ -49,7 +49,7 @@ impl Swarm {
             .1
     }
 
-    pub fn argmax(particles: &[Particle]) -> &Particle {
+    fn argmax(particles: &[Particle]) -> &Particle {
         particles
             .iter()
             .enumerate()
@@ -71,15 +71,30 @@ impl Swarm {
 
         let best = Swarm::argmin(&self.particles);
 
-        self.gbest_pos = best.pbest_pos;
-        self.gbest_val = best.pbest_val;
-    }
-
-    pub fn train(&mut self, episodes: usize) -> Particle {
-        for _ in 0..episodes {
-            self.step();
+        if best.pbest_val < self.gbest_val {
+            self.gbest_pos = best.pbest_pos;
+            self.gbest_val = best.pbest_val;
         }
-
-        *Swarm::argmin(&self.particles)
     }
+
+    pub fn train(&mut self, episodes: usize, mut observer: Option<&mut dyn SwarmObserver>) {
+        for i in 0..episodes {
+            self.step();
+            if let Some(obs) = observer.as_deref_mut() {
+                obs.on_iteration(self, i);
+            }
+        }
+    }
+
+    pub fn best(&self) -> &Particle {
+        Self::argmin(&self.particles)
+    }
+
+    pub fn worst(&self) -> &Particle {
+        Self::argmax(&self.particles)
+    }
+}
+
+pub trait SwarmObserver {
+    fn on_iteration(&mut self, swarm: &Swarm, iter: usize);
 }
