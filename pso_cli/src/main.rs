@@ -18,7 +18,7 @@ fn main() -> Result<()> {
 
     let start = Instant::now();
 
-    swarm.train(args.episodes, None);
+    swarm.optimize(args.episodes, None);
 
     let duration = start.elapsed();
 
@@ -28,7 +28,7 @@ fn main() -> Result<()> {
         "f({}, {}) = {}",
         best.pbest_pos.x, best.pbest_pos.y, best.pbest_val
     );
-    println!("Training took: {:?}", duration);
+    println!("Optimizing took: {:?}", duration);
 
     Ok(())
 }

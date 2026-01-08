@@ -81,7 +81,7 @@ fn run_experiment(parameters: &Parameters) -> Result<Results> {
 
     let start = Instant::now();
 
-    swarm.train(parameters.episodes, Some(&mut observer));
+    swarm.optimize(parameters.episodes, Some(&mut observer));
 
     let duration = start.elapsed();
 

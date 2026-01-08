@@ -84,7 +84,7 @@ impl Swarm {
         }
     }
 
-    pub fn train(&mut self, episodes: usize, mut observer: Option<&mut dyn SwarmObserver>) {
+    pub fn optimize(&mut self, episodes: usize, mut observer: Option<&mut dyn SwarmObserver>) {
         for i in 0..episodes {
             self.step();
             if let Some(obs) = observer.as_deref_mut() {
