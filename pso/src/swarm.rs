@@ -1,9 +1,9 @@
 use glam::Vec2;
 
-use crate::{functions::Function, particle::Particle};
+use crate::{errors::SwarmError, functions::Function, particle::Particle};
 
 pub struct Swarm {
-    pub particles: Vec<Particle>,
+    particles: Vec<Particle>,
     inertia_weight: f32,
     c_coeff: f32,
     s_coeff: f32,
@@ -19,7 +19,14 @@ impl Swarm {
         c_coeff: f32,
         s_coeff: f32,
         function: Function,
-    ) -> Self {
+    ) -> Result<Self, SwarmError> {
+        if particle_count == 0 {
+            return Err(SwarmError::ZeroParticles);
+        }
+        if !inertia_weight.is_finite() || !c_coeff.is_finite() || !s_coeff.is_finite() {
+            return Err(SwarmError::InvalidCoefficients);
+        }
+
         let (x_min, y_min, x_max, y_max) = function.domain();
         let particles: Vec<Particle> = (0..particle_count)
             .map(|_| Particle::new(&function, x_min, y_min, x_max, y_max))
@@ -29,7 +36,7 @@ impl Swarm {
         let gbest_pos = best.pbest_pos;
         let gbest_val = best.pbest_val;
 
-        Self {
+        Ok(Self {
             particles,
             inertia_weight,
             c_coeff,
@@ -37,25 +44,25 @@ impl Swarm {
             gbest_pos,
             gbest_val,
             function,
-        }
+        })
     }
 
     fn argmin(particles: &[Particle]) -> &Particle {
+        debug_assert!(!particles.is_empty());
+
         particles
             .iter()
-            .enumerate()
-            .min_by(|a, b| a.1.pbest_val.partial_cmp(&b.1.pbest_val).unwrap())
+            .min_by(|a, b| a.pbest_val.total_cmp(&b.pbest_val))
             .unwrap()
-            .1
     }
 
     fn argmax(particles: &[Particle]) -> &Particle {
+        debug_assert!(!particles.is_empty());
+
         particles
             .iter()
-            .enumerate()
-            .max_by(|a, b| a.1.pbest_val.partial_cmp(&b.1.pbest_val).unwrap())
+            .max_by(|a, b| a.pbest_val.total_cmp(&b.pbest_val))
             .unwrap()
-            .1
     }
 
     pub fn step(&mut self) {
@@ -92,6 +99,10 @@ impl Swarm {
 
     pub fn worst(&self) -> &Particle {
         Self::argmax(&self.particles)
+    }
+
+    pub fn particles(&self) -> &[Particle] {
+        &self.particles
     }
 }
 

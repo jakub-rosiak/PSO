@@ -10,3 +10,4 @@ glam = { version = "0.30.9", features = ["serde"] }
 serde = { version = "1.0.228", features = ["derive"] }
 pso = { path = "../pso" }
 serde_json = "1.0.145"
+anyhow = "1.0.100"

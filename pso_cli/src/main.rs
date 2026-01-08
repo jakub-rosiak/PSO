@@ -1,10 +1,11 @@
 use std::time::Instant;
 
+use anyhow::Result;
 use clap::Parser;
 use pso::{functions::Function, swarm::Swarm};
 use serde::Serialize;
 
-fn main() -> std::io::Result<()> {
+fn main() -> Result<()> {
     let args = Args::parse();
 
     let mut swarm = Swarm::new(
@@ -13,7 +14,7 @@ fn main() -> std::io::Result<()> {
         args.c_coeff,
         args.s_coeff,
         args.function,
-    );
+    )?;
 
     let start = Instant::now();
 

@@ -4,7 +4,7 @@ pub fn mean(v: &[f32]) -> f32 {
 }
 
 pub fn median(v: &mut [f32]) -> f32 {
-    v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    v.sort_by(|a, b| a.total_cmp(b));
     let len = v.len();
     if len.is_multiple_of(2) {
         (v[len / 2 - 1] + v[len / 2]) / 2.0

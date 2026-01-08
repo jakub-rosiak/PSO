@@ -44,8 +44,8 @@ impl Particle {
         let mut rng = rand::rng();
 
         self.vel = self.vel * inertia
-            + c_coeff * rng.random_range(0.0..1.1) * (self.pbest_pos - self.pos)
-            + s_coeff * rng.random_range(0.0..1.0) * (gbest - self.pos);
+            + c_coeff * rng.random_range(0.0..=1.0) * (self.pbest_pos - self.pos)
+            + s_coeff * rng.random_range(0.0..=1.0) * (gbest - self.pos);
         self.pos += self.vel;
     }
 }

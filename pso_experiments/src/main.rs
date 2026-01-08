@@ -1,11 +1,8 @@
 use std::{
-    fs::File,
-    io::{BufWriter, Write},
-    path::PathBuf,
-    sync::Mutex,
-    time::Instant,
+    fs::File, io::{BufWriter, Write}, path::PathBuf, sync::mpsc::{Sender, channel}, thread, time::Instant
 };
 
+use anyhow::Result;
 use clap::Parser;
 use csv::ReaderBuilder;
 use glam::Vec2;
@@ -17,35 +14,68 @@ use crate::observer::{BestPoint, ExperimentObserver};
 
 mod observer;
 
-fn main() {
+fn main() -> Result<()> {
     let args = Args::parse();
 
     let experiments = load_experiments(args.input);
 
-    let file = File::create(args.output).unwrap();
+    let (tx, rx) = channel::<Vec<u8>>();
 
-    let writer = Mutex::new(BufWriter::new(file));
+    let writer_thread = thread::spawn(move || {
+        let file = match File::create(args.output) {
+            Ok(f) => f,
+            Err(e) => {
+                eprintln!("Failed to create file: {}", e);
+                return;
+            }
+        };
 
-    experiments.par_iter().for_each(|e| {
-        for _ in 0..args.repeats {
-            let result = run_experiment(e);
-            let json = serde_json::to_string(&result).unwrap();
+        let mut writer = BufWriter::new(file);
 
-            let mut w = writer.lock().unwrap();
-            w.write_all(json.as_bytes()).unwrap();
-            w.write_all(b"\n").unwrap();
+        for json in rx {
+            if let Err(e) = writer.write_all(&json) {
+                eprintln!("Falied to write JSON: {}", e);
+            }
         }
     });
+
+    experiments.par_iter().for_each(|e| {
+        if let Err(err) = run_and_write(e, &tx, args.repeats) {
+            eprintln!("Error processing experiment: {}", err);
+        }
+    });
+
+    drop(tx);
+    if let Err(err) = writer_thread.join() {
+        eprintln!("Writer thread panicked: {:?}", err);
+    };
+
+    Ok(())
 }
 
-fn run_experiment(parameters: &Parameters) -> Results {
+fn run_and_write(
+    e: &Parameters,
+    tx: &Sender<Vec<u8>>,
+    repeats: usize,
+) -> Result<()> {
+    for _ in 0..repeats {
+        let result = run_experiment(e)?;
+        let mut json = serde_json::to_string(&result)?.into_bytes();
+        json.push(b'\n');
+        tx.send(json)?;
+    }
+    Ok(())
+}
+
+
+fn run_experiment(parameters: &Parameters) -> Result<Results> {
     let mut swarm = Swarm::new(
         parameters.particle_size,
         parameters.inertia_weight,
         parameters.c_coeff,
         parameters.s_coeff,
         parameters.function,
-    );
+    )?;
 
     let mut observer = ExperimentObserver::new(parameters.episodes);
 
@@ -58,9 +88,9 @@ fn run_experiment(parameters: &Parameters) -> Results {
     let best = swarm.best();
     let worst = swarm.worst();
 
-    let mut pvals: Vec<f32> = swarm.particles.iter().map(|p| p.pbest_val).collect();
+    let mut pvals: Vec<f32> = swarm.particles().iter().map(|p| p.pbest_val).collect();
 
-    Results {
+    Ok(Results {
         params: *parameters,
         particles: observer.points,
         best: best.pbest_val,
@@ -70,7 +100,7 @@ fn run_experiment(parameters: &Parameters) -> Results {
         median: math::median(&mut pvals),
         std: math::std_dev(&pvals),
         time: duration.as_micros(),
-    }
+    })
 }
 
 fn load_experiments(path: PathBuf) -> Vec<Parameters> {
