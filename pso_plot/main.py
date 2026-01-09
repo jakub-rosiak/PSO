@@ -131,7 +131,11 @@ import os
 
 def plot_convergence(df, output_dir="plots"):
     os.makedirs(output_dir, exist_ok=True)
-    plt.figure(figsize=(8,6))
+
+    plt.figure(figsize=(8, 6))
+
+    plotted_any = False
+
     for func in df["function"].unique():
         baseline_exp = df[
             (df["function"] == func) &
@@ -146,24 +150,32 @@ def plot_convergence(df, output_dir="plots"):
             print(f"No baseline experiment found for {func}. Skipping.")
             continue
 
-        baseline_exp_row = baseline_exp.iloc[0] 
-        
-        points = baseline_exp_row["particles"]
+        row = baseline_exp.iloc[0]
+        points = row["particles"]
 
         iterations = [p["iter"] for p in points]
         best_vals = [p["best_val"] for p in points]
 
-        
-        plt.plot(iterations, best_vals, marker='o', markersize=3, label="Best Value")
+        plt.plot(iterations, best_vals, label=func)
+        plotted_any = True
+
+    if not plotted_any:
+        print("No baseline experiments found. Nothing plotted.")
+        plt.close()
+        return
+
     plt.yscale("log")
     plt.xlabel("Iteration")
     plt.ylabel("Best Value")
-    plt.title(f"PSO Convergence for {func} (Baseline)")
+    plt.title("PSO Convergence (Baseline)")
+    plt.legend()
     plt.grid(True)
     plt.tight_layout()
     plt.savefig(f"{output_dir}/convergence.png")
     plt.close()
-    print(f"Saved convergence plot for {func}")
+
+    print("Saved convergence plot.")
+
 
 def plot_experiment_times(df, output_dir="plots"):
     os.makedirs(output_dir, exist_ok=True)
