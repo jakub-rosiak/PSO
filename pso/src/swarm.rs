@@ -27,9 +27,12 @@ impl Swarm {
             return Err(SwarmError::InvalidCoefficients);
         }
 
+        let mut rng = rand::rng();
+
         let (x_min, y_min, x_max, y_max) = function.domain();
+
         let particles: Vec<Particle> = (0..particle_count)
-            .map(|_| Particle::new(&function, x_min, y_min, x_max, y_max))
+            .map(|_| Particle::new(&function, x_min, y_min, x_max, y_max, &mut rng))
             .collect();
 
         let best = Swarm::argmin(&particles);

@@ -146,13 +146,9 @@ def plot_convergence(df, output_dir="plots"):
             print(f"No baseline experiment found for {func}. Skipping.")
             continue
 
-        baseline_exp_row = baseline_exp.iloc[0]  # single row as Series
-        # If 'particles' is a dict, this works directly
+        baseline_exp_row = baseline_exp.iloc[0] 
+        
         points = baseline_exp_row["particles"]
-
-        # If 'particles' is a string (common if loaded from CSV), uncomment:
-        # import json
-        # points = json.loads(baseline_exp_row["particles"])["points"]
 
         iterations = [p["iter"] for p in points]
         best_vals = [p["best_val"] for p in points]

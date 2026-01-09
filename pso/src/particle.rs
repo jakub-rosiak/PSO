@@ -12,8 +12,7 @@ pub struct Particle {
 }
 
 impl Particle {
-    pub fn new(function: &Function, x_min: f32, y_min: f32, x_max: f32, y_max: f32) -> Self {
-        let mut rng = rand::rng();
+    pub fn new(function: &Function, x_min: f32, y_min: f32, x_max: f32, y_max: f32, rng: &mut impl Rng) -> Self {
         let pos = Vec2::new(
             rng.random_range(x_min..x_max),
             rng.random_range(y_min..y_max),
